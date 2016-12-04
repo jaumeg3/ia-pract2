@@ -7,6 +7,9 @@ import argparse
 # Main
 ##############################################################################
 
+global auction
+auction = 0
+
 def main(opts):
     # Este código de ejemplo os escribirá por pantalla el valor de las
     # variables proporcionadas mediante la linea de comandos
@@ -27,6 +30,45 @@ def main(opts):
 
     # **** YOUR CODE HERE ****
 
+    readFile(opts.auction)
+
+def readFile(fitxer):
+    with open(fitxer, 'r') as stream:
+        readStream(stream)
+
+def readStream(stream):
+    matrix = []
+    n_goods, n_bids, n_dummies = -1, -1, -1
+    boolean = True
+    reader = (l.strip() for l in stream)
+    for line in (l for l in reader if l):
+        temporal = line.split()
+        if n_goods != -1 and n_bids != -1 and boolean:
+            matrix = [range(n_goods+1) for i in range(n_bids)]
+            boolean = False
+        if temporal[0] == '%' or temporal[0] == "%%" or temporal[0] == '':
+            pass
+        elif temporal[0] == 'goods':
+            n_goods = int(temporal[1])
+        elif temporal[0] == 'bids':
+            n_bids = int(temporal[1])
+        elif temporal[0] == 'dummy':
+            n_dummies = int(temporal[1])
+        else:
+            addMatrix(matrix, temporal)
+    print matrix
+    print n_goods
+    print n_bids
+    print n_dummies
+
+def addMatrix(matrix, valors):
+    global auction
+    matrix[auction][0] = int(valors[1])
+    for i in range(1,len(valors)-2):
+        if int(valors[i]) > 15: pass
+        else:
+            matrix[auction][int(valors[i])] = "True"
+    auction += 1
 
 # Script entry point
 ###############################################################################
