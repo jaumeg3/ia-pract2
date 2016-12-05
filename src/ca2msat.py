@@ -7,9 +7,6 @@ import argparse
 # Main
 ##############################################################################
 
-global auction
-auction = 0
-
 def main(opts):
     # Este código de ejemplo os escribirá por pantalla el valor de las
     # variables proporcionadas mediante la linea de comandos
@@ -37,14 +34,19 @@ def readFile(fitxer):
         readStream(stream)
 
 def readStream(stream):
-    matrix = []
+    bids = dict()
+    conjunt = []
+    agents = dict()
     n_goods, n_bids, n_dummies = -1, -1, -1
     boolean = True
     reader = (l.strip() for l in stream)
     for line in (l for l in reader if l):
         temporal = line.split()
-        if n_goods != -1 and n_bids != -1 and boolean:
-            matrix = [range(n_goods+1) for i in range(n_bids)]
+        if n_goods != -1 and n_bids != -1 and n_dummies != -1 and boolean:
+            for x in range(0, n_goods):
+                bids["Good "+str(x)] = []
+            for x in range(0, n_dummies):
+                agents["Agent "+str(x)] = []
             boolean = False
         if temporal[0] == '%' or temporal[0] == "%%" or temporal[0] == '':
             pass
@@ -55,22 +57,29 @@ def readStream(stream):
         elif temporal[0] == 'dummy':
             n_dummies = int(temporal[1])
         else:
-            addMatrix(matrix, temporal)
-    print matrix
-    print n_goods
-    print n_bids
-    print n_dummies
+            pass
+            addBids(bids, conjunt, temporal, n_goods, agents)
+    #print bids
+    #print n_goods
+    #print n_bids
+    #print n_dummies
+    #print conjunt
+    print agents
 
-def addMatrix(matrix, valors):
-    global auction
-    matrix[auction][0] = int(valors[1])
-    for i in range(1,len(valors)-2):
-        if int(valors[i]) > 15: pass
-        else:
-            matrix[auction][int(valors[i])] = "True"
-    auction += 1
+def addBids(bids, conjunt, temporal, n_goods, agents):
+    n_conjunt = "X"+str(len(conjunt))
+    conjunt.append((str(n_conjunt), temporal[1]))
+    if int(temporal[-2]) < n_goods:
+        agents["Agent "+str(len(agents))] = str(n_conjunt)
+    else:
+        agents["Agent "+str(int(temporal[-2]) % n_goods)].append(str(n_conjunt))
+    for x in range(0,len(temporal)):
+        if x < 2 or x == len(temporal)-1:
+            pass
+        elif int(temporal[x]) < n_goods:
+            bids["Good "+str(temporal[x])].append(str(n_conjunt))
 
-# Script entry point
+#Script entry point
 ###############################################################################
 
 if __name__ == '__main__':
