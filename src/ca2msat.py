@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import argparse, os
+import argparse
+import os
 
 
 # Main
@@ -33,14 +34,14 @@ def main(opts):
     print "Soft: " + str(conjunt)
     print "Persona: " + str(agent)
 
-    soft, hard, correlacio = evaluateDependencies(bids, conjunt, agent, opts.accept_at_least_one, opts.accept_at_most_one\
+    soft, hard, alo, correlacio = evaluateDependencies(bids, conjunt, agent, opts.accept_at_least_one, opts.accept_at_most_one\
                                       , opts.transform_to_1_3_wpm)
-    writeFile(opts.formula, soft, hard, correlacio)
+    writeFile(opts.formula, soft, hard, alo, correlacio)
     executeSolver(opts.solver, opts.formula)
     print "----------------------------------------------------------------------------"
     print "Soft" + str(soft)
     print "Hard" + str(hard)
-
+    print "ALO" + str(alo)
 
 
 def readFile(fitxer):
@@ -79,9 +80,9 @@ def addBids(bids, conjunt, temporal, n_goods, agents):
     n_conjunt = int(len(conjunt) ) + 1#n_conjunt = "X"+str(len(conjunt))
     conjunt.append((int(n_conjunt), int(temporal[1])))
     if int(temporal[-2]) < n_goods:
-        agents["Agent "+str(len(agents))] = str(n_conjunt)
+        agents["Agent "+str(len(agents))] = int(n_conjunt)
     else:
-        agents["Agent "+str(int(temporal[-2]) % n_goods)].append(str(n_conjunt))
+        agents["Agent "+str(int(temporal[-2]) % n_goods)].append(int(n_conjunt))
     for x in range(0,len(temporal)):
         if x < 2 or x == len(temporal)-1:
             pass
@@ -91,34 +92,45 @@ def addBids(bids, conjunt, temporal, n_goods, agents):
 
 def evaluateDependencies(bids, conjunt, agent, ALO, AMO, WPM):
     hard = []
+    alo = []
+    amo = []
     correlacio = 0
     for x in range(0, len(bids)):
         hard.append(bids.get("Good "+str(x)))
-    return conjunt, hard, correlacio
+    if ALO:
+        for x in range(0, len(agent)):
+            alo.append(agent.get("Agent "+str(x)))
+    if AMO:
+        for x in range(0, len(agent)):
+            pass
+    return conjunt, hard, alo, correlacio
 
 
-def writeFile(filepath, soft, hard, correlacio):
+def writeFile(filepath, soft, hard, alo, correlacio):
     with open(filepath, 'w') as f:
-        writeDimacs(f, soft, hard, correlacio)
+        writeDimacs(f, soft, hard, alo, correlacio)
 
 
-def writeDimacs(f, soft, hard, correlacio):
+def writeDimacs(f, soft, hard, alo, correlacio):
     infinity = 1
     for x in range(0,len(soft)):
         infinity += soft[x][1]
     num_vars = len(soft) + correlacio
-    num_clauses = len(soft) + len(hard)
+    num_clauses = len(soft) + len(hard) + len(alo)
     print >> f, "p wcnf %d %d %d" % (num_vars, num_clauses, infinity)
     print >> f, "c ===== SOFT CLAUSULES  TotalWeight = %d =====" % (infinity-1)
     for x in range(0, len(soft)):
         print >> f, "%s %s 0" % (soft[x][1], soft[x][0])
-    print >> f, "c ===== HARD CLAUSULES ====="
+    print >> f, "c =====     HARD CLAUSULES    ====="
+    print >> f, "c ----- Compatibility of bids -----"
     for x in range(0,len(hard)):
-        print >> f, "%d %s 0" % (infinity, str(hard[x]).strip(']').replace(', ', ' -').replace('[', ' -'))
-
+        print >> f, "%d %s 0" % (infinity, str(hard[x]).strip(']').replace(', ', ' -').replace('[', '-'))
+    print >> f, "c -----          ALO          -----"
+    for x in range(0,len(alo)):
+        print >> f, "%d %s 0" % (infinity, str(alo[x]).strip('[]').replace(', ', ' '))
 
 def executeSolver(solver, formula):
-    print os.system("bash " + str(solver) + formula)
+    os.system(str(solver) + " " + formula)
 
 #Script entry point
 ###############################################################################
