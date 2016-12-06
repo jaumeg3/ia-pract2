@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import argparse
+import argparse, os
 
 
 # Main
@@ -27,16 +27,29 @@ def main(opts):
 
     # **** YOUR CODE HERE ****
 
-    readFile(opts.auction)
+    bids, conjunt, agent = readFile(opts.auction)
+
+    print "Bids: " + str(bids)
+    print "Soft: " + str(conjunt)
+    print "Persona: " + str(agent)
+
+    soft, hard, correlacio = evaluateDependencies(bids, conjunt, agent, opts.accept_at_least_one, opts.accept_at_most_one\
+                                      , opts.transform_to_1_3_wpm)
+    writeFile(opts.formula, soft, hard, correlacio)
+    executeSolver(opts.solver, opts.formula)
+    print "----------------------------------------------------------------------------"
+    print "Soft" + str(soft)
+    print "Hard" + str(hard)
+
+
 
 def readFile(fitxer):
     with open(fitxer, 'r') as stream:
-        readStream(stream)
+        return readStream(stream)
+
 
 def readStream(stream):
-    bids = dict()
-    conjunt = []
-    agents = dict()
+    bids, conjunt, agents = dict(), [], dict()
     n_goods, n_bids, n_dummies = -1, -1, -1
     boolean = True
     reader = (l.strip() for l in stream)
@@ -59,16 +72,12 @@ def readStream(stream):
         else:
             pass
             addBids(bids, conjunt, temporal, n_goods, agents)
-    #print bids
-    #print n_goods
-    #print n_bids
-    #print n_dummies
-    #print conjunt
-    print agents
+    return bids, conjunt, agents
+
 
 def addBids(bids, conjunt, temporal, n_goods, agents):
-    n_conjunt = "X"+str(len(conjunt))
-    conjunt.append((str(n_conjunt), temporal[1]))
+    n_conjunt = int(len(conjunt) ) + 1#n_conjunt = "X"+str(len(conjunt))
+    conjunt.append((int(n_conjunt), int(temporal[1])))
     if int(temporal[-2]) < n_goods:
         agents["Agent "+str(len(agents))] = str(n_conjunt)
     else:
@@ -77,7 +86,39 @@ def addBids(bids, conjunt, temporal, n_goods, agents):
         if x < 2 or x == len(temporal)-1:
             pass
         elif int(temporal[x]) < n_goods:
-            bids["Good "+str(temporal[x])].append(str(n_conjunt))
+            bids["Good "+str(temporal[x])].append(int(n_conjunt))
+
+
+def evaluateDependencies(bids, conjunt, agent, ALO, AMO, WPM):
+    hard = []
+    correlacio = 0
+    for x in range(0, len(bids)):
+        hard.append(bids.get("Good "+str(x)))
+    return conjunt, hard, correlacio
+
+
+def writeFile(filepath, soft, hard, correlacio):
+    with open(filepath, 'w') as f:
+        writeDimacs(f, soft, hard, correlacio)
+
+
+def writeDimacs(f, soft, hard, correlacio):
+    infinity = 1
+    for x in range(0,len(soft)):
+        infinity += soft[x][1]
+    num_vars = len(soft) + correlacio
+    num_clauses = len(soft) + len(hard)
+    print >> f, "p wcnf %d %d %d" % (num_vars, num_clauses, infinity)
+    print >> f, "c ===== SOFT CLAUSULES  TotalWeight = %d =====" % (infinity-1)
+    for x in range(0, len(soft)):
+        print >> f, "%s %s 0" % (soft[x][1], soft[x][0])
+    print >> f, "c ===== HARD CLAUSULES ====="
+    for x in range(0,len(hard)):
+        print >> f, "%d %s 0" % (infinity, str(hard[x]).strip(']').replace(', ', ' -').replace('[', ' -'))
+
+
+def executeSolver(solver, formula):
+    print os.system("bash " + str(solver) + formula)
 
 #Script entry point
 ###############################################################################
