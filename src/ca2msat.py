@@ -3,7 +3,8 @@
 
 import argparse
 import os
-
+from reader import *
+from creator import *
 
 # Main
 ##############################################################################
@@ -28,106 +29,19 @@ def main(opts):
 
     # **** YOUR CODE HERE ****
 
-    bids, conjunt, agent = readFile(opts.auction)
-
-    print "Bids: " + str(bids)
-    print "Soft: " + str(conjunt)
-    print "Persona: " + str(agent)
-
-    soft, hard, alo, correlacio = evaluateDependencies(bids, conjunt, agent, opts.accept_at_least_one, opts.accept_at_most_one\
-                                      , opts.transform_to_1_3_wpm)
-    writeFile(opts.formula, soft, hard, alo, correlacio)
-    executeSolver(opts.solver, opts.formula)
-    print "----------------------------------------------------------------------------"
-    print "Soft" + str(soft)
-    print "Hard" + str(hard)
-    print "ALO" + str(alo)
-
-
-def readFile(fitxer):
-    with open(fitxer, 'r') as stream:
-        return readStream(stream)
-
-
-def readStream(stream):
-    bids, conjunt, agents = dict(), [], dict()
-    n_goods, n_bids, n_dummies = -1, -1, -1
-    boolean = True
-    reader = (l.strip() for l in stream)
-    for line in (l for l in reader if l):
-        temporal = line.split()
-        if n_goods != -1 and n_bids != -1 and n_dummies != -1 and boolean:
-            for x in range(0, n_goods):
-                bids["Good "+str(x)] = []
-            for x in range(0, n_dummies):
-                agents["Agent "+str(x)] = []
-            boolean = False
-        if temporal[0] == '%' or temporal[0] == "%%" or temporal[0] == '':
-            pass
-        elif temporal[0] == 'goods':
-            n_goods = int(temporal[1])
-        elif temporal[0] == 'bids':
-            n_bids = int(temporal[1])
-        elif temporal[0] == 'dummy':
-            n_dummies = int(temporal[1])
-        else:
-            pass
-            addBids(bids, conjunt, temporal, n_goods, agents)
-    return bids, conjunt, agents
-
-
-def addBids(bids, conjunt, temporal, n_goods, agents):
-    n_conjunt = int(len(conjunt) ) + 1#n_conjunt = "X"+str(len(conjunt))
-    conjunt.append((int(n_conjunt), int(temporal[1])))
-    if int(temporal[-2]) < n_goods:
-        agents["Agent "+str(len(agents))] = int(n_conjunt)
-    else:
-        agents["Agent "+str(int(temporal[-2]) % n_goods)].append(int(n_conjunt))
-    for x in range(0,len(temporal)):
-        if x < 2 or x == len(temporal)-1:
-            pass
-        elif int(temporal[x]) < n_goods:
-            bids["Good "+str(temporal[x])].append(int(n_conjunt))
-
-
-def evaluateDependencies(bids, conjunt, agent, ALO, AMO, WPM):
-    hard = []
-    alo = []
-    amo = []
-    correlacio = 0
-    for x in range(0, len(bids)):
-        hard.append(bids.get("Good "+str(x)))
-    if ALO:
-        for x in range(0, len(agent)):
-            alo.append(agent.get("Agent "+str(x)))
-    if AMO:
-        for x in range(0, len(agent)):
-            pass
-    return conjunt, hard, alo, correlacio
-
-
-def writeFile(filepath, soft, hard, alo, correlacio):
-    with open(filepath, 'w') as f:
-        writeDimacs(f, soft, hard, alo, correlacio)
-
-
-def writeDimacs(f, soft, hard, alo, correlacio):
-    infinity = 1
-    for x in range(0,len(soft)):
-        infinity += soft[x][1]
-    num_vars = len(soft) + correlacio
-    num_clauses = len(soft) + len(hard) + len(alo)
-    print >> f, "p wcnf %d %d %d" % (num_vars, num_clauses, infinity)
-    print >> f, "c ===== SOFT CLAUSULES  TotalWeight = %d =====" % (infinity-1)
-    for x in range(0, len(soft)):
-        print >> f, "%s %s 0" % (soft[x][1], soft[x][0])
-    print >> f, "c =====     HARD CLAUSULES    ====="
-    print >> f, "c ----- Compatibility of bids -----"
-    for x in range(0,len(hard)):
-        print >> f, "%d %s 0" % (infinity, str(hard[x]).strip(']').replace(', ', ' -').replace('[', '-'))
-    print >> f, "c -----          ALO          -----"
-    for x in range(0,len(alo)):
-        print >> f, "%d %s 0" % (infinity, str(alo[x]).strip('[]').replace(', ', ' '))
+    reader = Reader()
+    reader.read_file(opts.auction)
+    if opts.accept_at_least_one:
+        reader.generate_alo()
+    if opts.accept_at_most_one:
+        pass
+        reader.generate_amo() # NO FUNCIONA!!!!
+    if opts.transform_to_1_3_wpm:
+        pass
+        # No implementat
+    create = Creator(opts.formula, reader.soft, reader.hard, reader.alo,
+                     reader.amo, reader.n_vars, reader.infinity)
+    create.write_file()
 
 def executeSolver(solver, formula):
     os.system(str(solver) + " " + formula)
