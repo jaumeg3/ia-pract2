@@ -12,9 +12,9 @@ class Creator:
 
     def write_file(self):
         with open(self.file_path, 'w') as f:
-            self.write_dimacs(f)
+            self._write_dimacs(f)
 
-    def write_dimacs(self, f):
+    def _write_dimacs(self, f):
         num_clauses = len(self.soft) + len(self.hard) + len(self.alo) \
                         + len(self.amo)
         print >> f, "p wcnf %d %d %d" % (self.num_vars, num_clauses,

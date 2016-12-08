@@ -10,9 +10,9 @@ class Reader():
 
     def read_file(self, file_name):
         with open(file_name, 'r') as stream:
-            return self.read_stream(stream)
+            return self._read_stream(stream)
 
-    def read_stream(self, stream):
+    def _read_stream(self, stream):
         bids = dict()
         n_goods, n_bids, n_dummies = -1, -1, -1
         boolean = True
@@ -34,12 +34,11 @@ class Reader():
             elif temporal[0] == 'dummy':
                 n_dummies = int(temporal[1])
             else:
-                pass
-                self.add_bids(bids, temporal, n_goods)
+                self._add_bids(bids, temporal, n_goods)
         for x in range(0, len(bids)):
             self.hard.append(bids.get("Good " + str(x)))
 
-    def add_bids(self, bids, temporal, n_goods):
+    def _add_bids(self, bids, temporal, n_goods):
         self.n_vars += 1
         self.soft.append((int(temporal[0])+1, int(temporal[1])))
         self.infinity += int(temporal[1])
@@ -47,14 +46,14 @@ class Reader():
             self.agents["Agent " + str(len(self.agents))] = int(temporal[0])+1
         else:
             self.agents["Agent " + str(int(temporal[-2])
-                                  % n_goods)].append(int(temporal[0])+1)
+                        % n_goods)].append(int(temporal[0])+1)
         for x in range(0, len(temporal)):
             if x < 2 or x == len(temporal) - 1:
                 pass
             elif int(temporal[x]) < n_goods:
                 bids["Good " + str(temporal[x])].append(int(temporal[0])+1)
 
-    def print_clauses(self):
+    def _print_clauses(self):
         print self.hard
         print self.soft
         print self.n_vars

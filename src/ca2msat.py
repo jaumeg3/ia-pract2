@@ -4,6 +4,7 @@
 import argparse
 from reader import *
 from creator import *
+from transform import *
 from subprocess import PIPE, Popen
 
 
@@ -48,6 +49,7 @@ def main(opts):
     execute.wait()
     output = execute.communicate()
     transform = Transform(output, opts.result)
+    transform.analize_result()
 
 #Script entry point
 ###############################################################################
