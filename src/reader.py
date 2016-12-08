@@ -65,7 +65,24 @@ class Reader():
             self.alo.append(self.agents.get("Agent "+str(c)))
 
     def generate_amo(self):
-        raise NotImplementedError()
+        print self.agents
+        for x in range(0, len(self.agents)):
+            try:
+                temporal = list(self.agents.get("Agent "+str(x)))
+                combinations = self._combinatory(temporal, 2)
+                for c in combinations:
+                    self.amo.append(c)
+            except:
+                pass
+
+    def _combinatory(self, c, n):
+        return [s for s in self._powers(c) if len(s) == n]
+
+    def _powers(self, c):
+        if len(c) == 0:
+            return [[]]
+        r = self._powers(c[:-1])
+        return r + [s + [c[-1]] for s in r]
 
     def transform_to_1_3_wpm(self):
         raise NotImplementedError()
