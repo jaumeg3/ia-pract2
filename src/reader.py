@@ -65,7 +65,6 @@ class Reader():
             self.alo.append(self.agents.get("Agent "+str(c)))
 
     def generate_amo(self):
-        print self.agents
         for x in range(0, len(self.agents)):
             try:
                 temporal = list(self.agents.get("Agent "+str(x)))
@@ -84,5 +83,29 @@ class Reader():
         r = self._powers(c[:-1])
         return r + [s + [c[-1]] for s in r]
 
-    def transform_to_1_3_wpm(self):
-        raise NotImplementedError()
+    def transform_to_1_3_wpm(self, alo = False):
+        self.hard = self._transform_to_1_3_wpm(self.hard, [])
+        if alo:
+            self.alo = self._transform_to_1_3_wpm(self.alo, [])
+
+    def _transform_to_1_3_wpm(self, source_list, destination_list):
+        for c in source_list:
+            print c
+            try:
+                if len(c) > 3:
+                    destination_list.append(c[:2] + [self._new_var()])
+                    temporal = 2
+                    for x in range(0, len(c) - 4):
+                        destination_list.append([-self.n_vars] + [c[temporal]]
+                                                + [self._new_var()])
+                        temporal += 1
+                    destination_list.append([-self.n_vars] + c[temporal:])
+                else:
+                    destination_list.append(c)
+            except:
+                pass
+        return destination_list
+
+    def _new_var(self):
+        self.n_vars += 1
+        return self.n_vars

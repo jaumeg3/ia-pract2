@@ -38,7 +38,7 @@ def main(opts):
     if opts.accept_at_most_one:
         reader.generate_amo()
     if opts.transform_to_1_3_wpm:
-        pass #reader.transform_to_1_3_wpm()
+        reader.transform_to_1_3_wpm(opts.accept_at_least_one)
     create = Creator(opts.formula, reader.soft, reader.hard, reader.alo,
                      reader.amo, reader.n_vars, reader.infinity)
     create.write_file()
