@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import os
 from reader import *
 from creator import *
+from subprocess import PIPE, Popen
+
 
 # Main
 ##############################################################################
@@ -38,13 +39,15 @@ def main(opts):
         reader.generate_amo() # NO FUNCIONA!!!!
     if opts.transform_to_1_3_wpm:
         pass
-        # No implementat
+        reader.transform_to_1_3_wpm()# No implementat
     create = Creator(opts.formula, reader.soft, reader.hard, reader.alo,
                      reader.amo, reader.n_vars, reader.infinity)
     create.write_file()
-
-def executeSolver(solver, formula):
-    os.system(str(solver) + " " + formula)
+    execute = Popen([opts.solver, opts.formula], stdin=PIPE, stdout=PIPE,
+                    bufsize=1)
+    execute.wait()
+    output = execute.communicate()
+    transform = Transform(output, opts.result)
 
 #Script entry point
 ###############################################################################

@@ -1,5 +1,5 @@
 
-class Creator(file):
+class Creator:
 
     def __init__(self, file_path, soft, hard, alo, amo, num_vars, infinity):
         self.file_path = file_path

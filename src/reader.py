@@ -44,15 +44,15 @@ class Reader():
         self.soft.append((int(temporal[0])+1, int(temporal[1])))
         self.infinity += int(temporal[1])
         if int(temporal[-2]) < n_goods:
-            self.agents["Agent " + str(len(self.agents))] = self.n_vars
+            self.agents["Agent " + str(len(self.agents))] = int(temporal[0])+1
         else:
             self.agents["Agent " + str(int(temporal[-2])
-                                  % n_goods)].append(self.n_vars)
+                                  % n_goods)].append(int(temporal[0])+1)
         for x in range(0, len(temporal)):
             if x < 2 or x == len(temporal) - 1:
                 pass
             elif int(temporal[x]) < n_goods:
-                bids["Good " + str(temporal[x])].append(self.n_vars)
+                bids["Good " + str(temporal[x])].append(int(temporal[0])+1)
 
     def print_clauses(self):
         print self.hard
@@ -66,8 +66,7 @@ class Reader():
             self.alo.append(self.agents.get("Agent "+str(c)))
 
     def generate_amo(self):
-        for c in range(0, len(self.agents)):
-            for x in range(0, len(self.agents.get("Agent "+str(c)))):
-                for y in range(0, len(self.agents.get("Agent "+str(c)))):
-                    print self.agents.get("Agent "+str(c))[x] \
-                        + self.agents.get("Agent "+str(c))[y]
+        raise NotImplementedError()
+
+    def transform_to_1_3_wpm(self):
+        raise NotImplementedError()
