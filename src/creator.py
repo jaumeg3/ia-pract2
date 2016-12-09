@@ -28,7 +28,7 @@ class Creator:
         for x in range(0, len(self.hard)):
             print >> f, "%d %s 0" \
                         % (self.infinity, str(self.hard[x]).
-                           strip(']').replace(', ', ' -').replace('[', '-'))
+                           strip('[]').replace(', ', ' '))
         if len(self.alo) > 0:
             print >> f, "c -----          ALO          -----"
             for x in range(0, len(self.alo)):

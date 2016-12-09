@@ -7,6 +7,7 @@ class Reader():
         self.amo = []
         self.infinity = 1
         self.agents = dict()
+        self.goods = 0
 
     def read_file(self, file_name):
         with open(file_name, 'r') as stream:
@@ -20,6 +21,7 @@ class Reader():
         for line in (l for l in read if l):
             temporal = line.split()
             if n_goods != -1 and n_bids != -1 and n_dummies != -1 and boolean:
+                self.goods = n_goods
                 for x in range(0, n_goods):
                     bids["Good " + str(x)] = []
                 for x in range(0, n_dummies):
@@ -51,7 +53,7 @@ class Reader():
             if x < 2 or x == len(temporal) - 1:
                 pass
             elif int(temporal[x]) < n_goods:
-                bids["Good " + str(temporal[x])].append(int(temporal[0])+1)
+                bids["Good " + str(temporal[x])].append(-(int(temporal[0])+1))
 
     def _print_clauses(self):
         print self.hard

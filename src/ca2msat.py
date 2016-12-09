@@ -46,7 +46,7 @@ def main(opts):
                     bufsize=1)
     execute.wait()
     output = execute.communicate()
-    transform = Transform(output, opts.result)
+    transform = Transform(output, opts.result, reader.goods)
     transform.analize_result()
 
 #Script entry point
