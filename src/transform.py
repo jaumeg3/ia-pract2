@@ -7,7 +7,6 @@ class Transform:
 
     def analize_result(self):
         for x in self.output[:-1]:
-            print x
             if x.split()[0] == 'v':
                 self._write_result(x.split())
             else:

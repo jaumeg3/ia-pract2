@@ -92,7 +92,6 @@ class Reader():
 
     def _transform_to_1_3_wpm(self, source_list, destination_list):
         for c in source_list:
-            print c
             try:
                 if len(c) > 3:
                     destination_list.append(c[:2] + [self._new_var()])
