@@ -18,12 +18,12 @@ class Creator:
         num_clauses = len(self.soft) + len(self.hard) + len(self.alo) \
                         + len(self.amo)
         print >> f, "p wcnf %d %d %d" % (self.num_vars, num_clauses,
-                                            self.infinity)
-        print >> f, "c ===== SOFT CLAUSULES  TotalWeight = {:d} =====" \
+                                         self.infinity)
+        print >> f, "c ===== SOFT CLAUSES  TotalWeight = {:d} =====" \
             .format(self.infinity - 1)
         for x in range(0, len(self.soft)):
             print >> f, "%s %s 0" % (self.soft[x][1], self.soft[x][0])
-        print >> f, "c =====     HARD CLAUSULES    ====="
+        print >> f, "c =====     HARD CLAUSES    ====="
         print >> f, "c ----- Compatibility of bids -----"
         self._write_clauses(f, self.hard)
         if len(self.alo) > 0:

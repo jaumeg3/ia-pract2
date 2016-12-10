@@ -1,4 +1,4 @@
-class Reader():
+class Reader:
     def __init__(self):
         self.n_vars = 0
         self.hard = []
@@ -86,7 +86,7 @@ class Reader():
         r = self._powers(c[:-1])
         return r + [s + [c[-1]] for s in r]
 
-    def transform_to_1_3_wpm(self, alo = False, amo = False):
+    def transform_to_1_3_wpm(self, alo=False, amo=False):
         self.hard = self._transform_to_1_3_wpm(self.hard, [])
         if alo:
             self.alo = self._transform_to_1_3_wpm(self.alo, [])
