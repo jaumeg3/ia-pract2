@@ -33,12 +33,11 @@ def main(opts):
 
     reader = Reader()
     reader.read_file(opts.auction)
-    if opts.accept_at_least_one:
-        reader.generate_alo()
-    if opts.accept_at_most_one:
-        reader.generate_amo()
-    if opts.transform_to_1_3_wpm:
-        reader.transform_to_1_3_wpm(opts.accept_at_least_one)
+    reader.generate_alo() if opts.accept_at_least_one else 0
+    reader.generate_amo() if opts.accept_at_most_one else 0
+    reader.transform_to_1_3_wpm(opts.accept_at_least_one,
+                                opts.accept_at_most_one) if \
+        opts.transform_to_1_3_wpm else 0
     create = Creator(opts.formula, reader.soft, reader.hard, reader.alo,
                      reader.amo, reader.n_vars, reader.infinity)
     create.write_file()
@@ -47,7 +46,7 @@ def main(opts):
     execute.wait()
     output = execute.communicate()
     transform = Transform(output, opts.result, reader.goods)
-    transform.analize_result()
+    transform.analyze_result()
 
 #Script entry point
 ###############################################################################

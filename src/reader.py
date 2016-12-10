@@ -45,10 +45,11 @@ class Reader():
         self.soft.append((int(temporal[0])+1, int(temporal[1])))
         self.infinity += int(temporal[1])
         if int(temporal[-2]) < n_goods:
-            self.agents["Agent " + str(len(self.agents))] = int(temporal[0])+1
+            self.agents["Agent " + str(len(self.agents))] = \
+                -(int(temporal[0])+1)
         else:
             self.agents["Agent " + str(int(temporal[-2])
-                        % n_goods)].append(int(temporal[0])+1)
+                        % n_goods)].append(-(int(temporal[0])+1))
         for x in range(0, len(temporal)):
             if x < 2 or x == len(temporal) - 1:
                 pass
@@ -85,10 +86,12 @@ class Reader():
         r = self._powers(c[:-1])
         return r + [s + [c[-1]] for s in r]
 
-    def transform_to_1_3_wpm(self, alo = False):
+    def transform_to_1_3_wpm(self, alo = False, amo = False):
         self.hard = self._transform_to_1_3_wpm(self.hard, [])
         if alo:
             self.alo = self._transform_to_1_3_wpm(self.alo, [])
+        if amo:
+            self.amo = self._transform_to_1_3_wpm(self.amo, [])
 
     def _transform_to_1_3_wpm(self, source_list, destination_list):
         for c in source_list:
@@ -102,7 +105,11 @@ class Reader():
                         temporal += 1
                     destination_list.append([-self.n_vars] + c[temporal:])
                 else:
-                    destination_list.append(c)
+                    if len(c) == 3:
+                        destination_list.append(c)
+                    elif len(c) == 2:
+                        destination_list.append([c]+[self._new_var()])
+                        destination_list.append([-self.n_vars])
             except:
                 pass
         return destination_list

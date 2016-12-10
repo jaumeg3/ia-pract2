@@ -25,19 +25,16 @@ class Creator:
             print >> f, "%s %s 0" % (self.soft[x][1], self.soft[x][0])
         print >> f, "c =====     HARD CLAUSULES    ====="
         print >> f, "c ----- Compatibility of bids -----"
-        for x in range(0, len(self.hard)):
-            print >> f, "%d %s 0" \
-                        % (self.infinity, str(self.hard[x]).
-                           strip('[]').replace(', ', ' '))
+        self._write_clauses(f, self.hard)
         if len(self.alo) > 0:
             print >> f, "c -----          ALO          -----"
-            for x in range(0, len(self.alo)):
-                print >> f, "%d %s 0" % (
-                    self.infinity, str(self.alo[x]).strip('[]').
-                    replace(', ', ' '))
+            self._write_clauses(f, self.alo)
         if len(self.amo) > 0:
             print >> f, "c -----          AMO          -----"
-            for c in range(0,len(self.amo)):
-                print >> f, "%d %s 0" % (
-                    self.infinity, str(self.amo[c]).
-                    strip(']').replace(', ', ' -').replace('[', '-'))
+            self._write_clauses(f, self.amo)
+
+    def _write_clauses(self, f, clauses):
+        for x in range(0, len(clauses)):
+            print >> f, "%d %s 0" \
+                        % (self.infinity, str(clauses[x]).
+                           strip('[]').replace(', ', ' ').replace(']', ''))
