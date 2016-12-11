@@ -56,13 +56,6 @@ class Reader:
             elif int(temporal[x]) < n_goods:
                 bids["Good " + str(temporal[x])].append(-(int(temporal[0])+1))
 
-    def _print_clauses(self):
-        print self.hard
-        print self.soft
-        print self.n_vars
-        print self.agents
-        print self.alo
-
     def generate_alo(self):
         for c in range(0, len(self.agents)):
             temporal = str(self.agents.get("Agent "+str(c))).replace('-', '')
