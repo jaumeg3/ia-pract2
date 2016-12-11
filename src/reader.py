@@ -65,7 +65,8 @@ class Reader:
 
     def generate_alo(self):
         for c in range(0, len(self.agents)):
-            self.alo.append(self.agents.get("Agent "+str(c)))
+            temporal = str(self.agents.get("Agent "+str(c))).replace('-', '')
+            self.alo.append(temporal)
 
     def generate_amo(self):
         for x in range(0, len(self.agents)):
