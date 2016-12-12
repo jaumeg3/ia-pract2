@@ -13,7 +13,7 @@ echo "Prova Pract2"
 echo "Create Auctions"
 mv cats-linux-x64 auctions/
 cd auctions/
-./cats-linux-x64 -d arbitrary -random_goods 5 10 -random_bids 5 10 -n 10 -int_prices
+./cats-linux-x64 -d arbitrary -random_goods 10 15 -random_bids 10 15 -n 10 -int_prices
 mv cats-linux-x64 ../
 cd ..
 
