@@ -10,8 +10,11 @@ class Reader:
         self.goods = 0
 
     def read_file(self, file_name):
-        with open(file_name, 'r') as stream:
-            return self._read_stream(stream)
+        try:
+            with open(file_name, 'r') as stream:
+                return self._read_stream(stream)
+        except:
+            print "Error, the file couldn't be read"
 
     def _read_stream(self, stream):
         bids = dict()
@@ -46,7 +49,7 @@ class Reader:
         self.infinity += int(temporal[1])
         if int(temporal[-2]) < n_goods:
             self.agents["Agent " + str(len(self.agents))] = \
-                -(int(temporal[0])+1)
+                [-(int(temporal[0])+1)]
         else:
             self.agents["Agent " + str(int(temporal[-2])
                         % n_goods)].append(-(int(temporal[0])+1))
@@ -57,19 +60,19 @@ class Reader:
                 bids["Good " + str(temporal[x])].append(-(int(temporal[0])+1))
 
     def generate_alo(self):
-        for c in range(0, len(self.agents)):
-            temporal = str(self.agents.get("Agent "+str(c))).replace('-', '')
-            self.alo.append(temporal)
+        for c in self.agents:
+            temporal = self.agents.get(c)
+            self.alo.append(map(abs, temporal))
 
     def generate_amo(self):
-        for x in range(0, len(self.agents)):
-            try:
-                temporal = list(self.agents.get("Agent "+str(x)))
+        for x in self.agents:
+            temporal = list(self.agents.get(x))
+            if len(temporal) > 1:
                 combinations = self._combinatory(temporal, 2)
                 for c in combinations:
                     self.amo.append(c)
-            except:
-                pass
+            else:
+                self.amo.append(temporal)
 
     def _combinatory(self, c, n):
         return [s for s in self._powers(c) if len(s) == n]
@@ -81,31 +84,28 @@ class Reader:
         return r + [s + [c[-1]] for s in r]
 
     def transform_to_1_3_wpm(self, alo=False, amo=False):
-        self.hard = self._transform_to_1_3_wpm(self.hard, [])
+        self.hard = self._transform_to_1_3_wpm(self.hard)
         if alo:
-            self.alo = self._transform_to_1_3_wpm(self.alo, [])
+            self.alo = self._transform_to_1_3_wpm(self.alo)
         if amo:
-            self.amo = self._transform_to_1_3_wpm(self.amo, [])
+            self.amo = self._transform_to_1_3_wpm(self.amo)
 
-    def _transform_to_1_3_wpm(self, source_list, destination_list):
+    def _transform_to_1_3_wpm(self, source_list):
+        destination_list = []
         for c in source_list:
-            try:
-                if len(c) > 3:
-                    destination_list.append(c[:2] + [self._new_var()])
-                    temporal = 2
-                    for x in range(0, len(c) - 4):
-                        destination_list.append([-self.n_vars] + [c[temporal]]
-                                                + [self._new_var()])
-                        temporal += 1
-                    destination_list.append([-self.n_vars] + c[temporal:])
-                else:
-                    if len(c) == 3:
-                        destination_list.append(c)
-                    elif len(c) == 2:
-                        destination_list.append([c]+[self._new_var()])
-                        destination_list.append([-self.n_vars])
-            except:
-                pass
+            if len(c) > 3:
+                destination_list.append(c[:2] + [self._new_var()])
+                temporal = 2
+                for x in range(0, len(c) - 4):
+                    destination_list.append([-self.n_vars] + [c[temporal]]
+                                            + [self._new_var()])
+                    temporal += 1
+                destination_list.append([-self.n_vars] + c[temporal:])
+            elif len(c) == 2:
+                destination_list.append([c]+[self._new_var()])
+                destination_list.append([-self.n_vars])
+            else:
+                destination_list.append(c)
         return destination_list
 
     def _new_var(self):

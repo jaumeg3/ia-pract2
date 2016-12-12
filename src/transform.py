@@ -11,11 +11,15 @@ class Transform:
                 self._write_result([])
 
     def _write_result(self, temporal):
-        with open(self.file_path, 'w') as f:
-            result = []
-            for x in temporal[1:]:
-                result.append(int(x) - 1) if 0 < int(x) < self.goods else 0
-            if len(result) > 0:
-                print >> f, "b %s" % str(result).strip("[]").replace(",", "")
-            else:
-                print >> f, "b NO SOLUTION"
+        try:
+            with open(self.file_path, 'w') as f:
+                result = []
+                for x in temporal[1:]:
+                    result.append(int(x) - 1) if 0 < int(x) < self.goods else 0
+                if len(result) > 0:
+                    print >> f, "b %s" % str(result).strip("[]").\
+                        replace(",", "")
+                else:
+                    print >> f, "b NO SOLUTION"
+        except:
+            print "Error, the file couldn't be created"

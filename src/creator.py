@@ -11,8 +11,11 @@ class Creator:
         self.infinity = infinity
 
     def write_file(self):
-        with open(self.file_path, 'w') as f:
-            self._write_dimacs(f)
+        try:
+            with open(self.file_path, 'w') as f:
+                self._write_dimacs(f)
+        except:
+            print "Error, the file couldn't be created"
 
     def _write_dimacs(self, f):
         num_clauses = len(self.soft) + len(self.hard) + len(self.alo) \
